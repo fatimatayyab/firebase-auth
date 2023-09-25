@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:testproject/constants/routes.dart';
 import 'package:testproject/services/auth/auth_service.dart';
 import 'package:testproject/views/login_view.dart';
@@ -22,7 +21,7 @@ void main() {
         registerRoute: (context) => const RegisterView(),
         notesRoute: (context) => const NotesView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
-        newNoteRoute: (context) => const newNoteView(),
+        newNoteRoute: (context) => const NewNoteView(),
       },
     ),
   );

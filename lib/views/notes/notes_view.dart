@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:testproject/services/auth/auth_service.dart';
 import 'package:testproject/services/crud/notes_service.dart';
 import 'dart:developer' as devtools show log;
@@ -78,6 +77,7 @@ class _NotesViewState extends State<NotesView> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
+                    case ConnectionState.active:
                       return const Text("waiting for all Notes");
                     default:
                       return const CircularProgressIndicator();
