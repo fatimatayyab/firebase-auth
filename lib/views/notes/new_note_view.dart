@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:testproject/services/auth/auth_service.dart';
 
 import '../../services/crud/notes_service.dart';
