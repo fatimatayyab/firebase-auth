@@ -27,7 +27,7 @@ class _NewNoteViewState extends State<NewNoteView> {
     );
   }
 
-  void _setupTextControllerListener() async {
+  void _setupTextControllerListener() {
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
   }

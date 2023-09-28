@@ -243,7 +243,7 @@ class NotesService {
       await db.execute(createNoteTable);
       await _cachedNotes();
     } on MissingPlatformDirectoryException {
-      throw UnableToGetDocumentsDirectory;
+      throw UnableToGetDocumentsDirectory();
     }
   }
 }
@@ -265,6 +265,7 @@ class DatabaseUser {
   String toString() => 'Person, ID=$id, email=$email';
 
   @override
+  
   bool operator ==(covariant DatabaseUser other) => id == other.id;
 
   @override
