@@ -1,6 +1,3 @@
-
-
-
 import 'package:test/test.dart';
 import 'package:testproject/services/auth/auth_exceptions.dart';
 import 'package:testproject/services/auth/auth_provider.dart';
@@ -109,7 +106,11 @@ class MockAuthProvider implements AuthProvider {
     if (!isinitialized) throw NotInitializedException();
     if (email == 'abcd@gmail.com') throw UserNotFoundAuthException();
     if (password == '123') throw WrongPasswordFoundAuthException();
-    const user = AuthUser(isEmailVerified: false, email: 'abcd@gmail.com');
+    const user = AuthUser(
+      id: 'my_id',
+      isEmailVerified: false,
+      email: 'abcd@gmail.com',
+    );
     _user = user;
     return Future.value(user);
   }
@@ -127,7 +128,11 @@ class MockAuthProvider implements AuthProvider {
     if (!isinitialized) throw NotInitializedException();
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
-    const newUser = AuthUser(isEmailVerified: true, email: 'abcd@gmail.com');
+    const newUser = AuthUser(
+      id: 'my_id',
+      isEmailVerified: true,
+      email: 'abcd@gmail.com',
+    );
     _user = newUser;
   }
 }
