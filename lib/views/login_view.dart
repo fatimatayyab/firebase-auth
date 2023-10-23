@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:testproject/constants/routes.dart';
-import 'package:testproject/services/auth/auth_service.dart';
+import 'package:testproject/services/auth/bloc/auth_bloc.dart';
+import 'package:testproject/services/auth/bloc/auth_event.dart';
 import '../utilities/dialogs/error_dialog.dart';
-
 import 'package:testproject/services/auth/auth_exceptions.dart';
 
 class LoginView extends StatefulWidget {
@@ -52,48 +53,51 @@ class _LoginViewState extends State<LoginView> {
           ),
           TextButton(
             onPressed: () async {
+              final email = _email.text;
+              final password = _password.text;
               try {
-                final email = _email.text;
-                final password = _password.text;
+                context.read<AuthBloc>().add(
+                      AuthEventLogIn(
+                        email,
+                        password,
+                      ),
+                    );
 
-                await AuthService.firebase().logIn(
-                  email: email,
-                  password: password,
+                // await AuthService.firebase().logIn(
+                //   email: email,
+                //   password: password,
+                // );
+                // final user = AuthService.firebase().currentUser;
+                // if (user?.isEmailVerified ?? false) {
+                //   // user's email is Verified
+
+                //   Navigator.of(context).pushNamedAndRemoveUntil(
+                //     notesRoute,
+                //     (route) => false,
+                //   );
+                // } else {
+                //   // user's email is NOT Verified
+                //   Navigator.of(context).pushNamedAndRemoveUntil(
+                //     verifyEmailRoute,
+                //     (route) => false,
+                //   );
+                // }
+              } on UserNotFoundAuthException {
+                await showErrorDialog(
+                  context,
+                  'User Not Found',
                 );
-                final user = AuthService.firebase().currentUser;
-                if (user?.isEmailVerified ?? false) {
-                  // user's email is Verified
-
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } else {
-                  // user's email is NOT Verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    verifyEmailRoute,
-                    (route) => false,
-                  );
-                }
-                 }
-                on UserNotFoundAuthException{
-                  await showErrorDialog(
-                    context,
-                    'User Not Found',
-                  );
- 
-                } on WrongPasswordFoundAuthException{
-
-                  await showErrorDialog(
-                    context,
-                    'Wrong Credentials',
-                  );
-                } on GenericAuthException{
-                  await showErrorDialog(
-                    context,
-                     'Authentication Error',
-                  ); 
-                }
+              } on WrongPasswordFoundAuthException {
+                await showErrorDialog(
+                  context,
+                  'Wrong Credentials',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context,
+                  'Authentication Error',
+                );
+              }
             },
             child: const Text("Login"),
           ),
