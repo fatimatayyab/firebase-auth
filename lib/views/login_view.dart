@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:testproject/constants/routes.dart';
 import 'package:testproject/services/auth/bloc/auth_bloc.dart';
 import 'package:testproject/services/auth/bloc/auth_event.dart';
+import 'package:testproject/services/auth/bloc/auth_state.dart';
 import '../utilities/dialogs/error_dialog.dart';
 import 'package:testproject/services/auth/auth_exceptions.dart';
 
@@ -42,64 +43,45 @@ class _LoginViewState extends State<LoginView> {
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: "Enter Your Email"),
+            decoration: const InputDecoration(
+              hintText: "Enter Your Email",
+            ),
           ),
           TextField(
             controller: _password,
-            decoration: const InputDecoration(hintText: "Enter Your Password"),
+            decoration: const InputDecoration(
+              hintText: "Enter Your Password",
+            ),
             obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
           ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                context.read<AuthBloc>().add(
-                      AuthEventLogIn(
-                        email,
-                        password,
-                      ),
-                    );
-
-                // await AuthService.firebase().logIn(
-                //   email: email,
-                //   password: password,
-                // );
-                // final user = AuthService.firebase().currentUser;
-                // if (user?.isEmailVerified ?? false) {
-                //   // user's email is Verified
-
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //     notesRoute,
-                //     (route) => false,
-                //   );
-                // } else {
-                //   // user's email is NOT Verified
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //     verifyEmailRoute,
-                //     (route) => false,
-                //   );
-                // }
-              } on UserNotFoundAuthException {
-                await showErrorDialog(
-                  context,
-                  'User Not Found',
-                );
-              } on WrongPasswordFoundAuthException {
-                await showErrorDialog(
-                  context,
-                  'Wrong Credentials',
-                );
-              } on GenericAuthException {
-                await showErrorDialog(
-                  context,
-                  'Authentication Error',
-                );
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              if (state is AuthStateLoggedOut) {
+                if (state.exception is UserNotFoundAuthException) {
+                  await showErrorDialog(context, 'User Not Found');
+                } else if (state.exception is WrongPasswordFoundAuthException) {
+                  await showErrorDialog(context, 'Wrong Credentials');
+                } else if (state.exception is GenericAuthException) {
+                  await showErrorDialog(context, 'Authentication Error');
+                }
               }
             },
-            child: const Text("Login"),
+            child: TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                 context.read<AuthBloc>().add(
+                        AuthEventLogIn(
+                          email,
+                          password,
+                        ),
+                      );
+                
+              },
+              child: const Text("Login"),
+            ),
           ),
           TextButton(
             onPressed: () {
