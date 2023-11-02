@@ -6,10 +6,15 @@ import 'package:testproject/services/cloud/cloud_storage_exceptions.dart';
 class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection('notes');
 
-  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) =>
-      notes.snapshots().map((event) => event.docs
-          .map((doc) => CloudNote.fromSnapshot(doc))
-          .where((note) => note.ownerUserId == ownerUserId));
+  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) {
+    final allNotes = notes
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .snapshots()
+        .map((event) => event.docs
+            .map((doc) => CloudNote.fromSnapshot(doc))
+      );
+    return allNotes;
+  }
 
 //delete Note
   Future<void> deleteNote({required String documentId}) async {
@@ -32,23 +37,6 @@ class FirebaseCloudStorage {
     }
   }
 
-  //Getting Note
-  Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
-    try {
-      return await notes
-          .where(
-            ownerUserIdFieldName,
-            isEqualTo: ownerUserId,
-          )
-          .get()
-          .then(
-            (value) => value.docs.map((doc) => CloudNote.fromSnapshot(doc)),
-          );
-    } catch (e) {
-      throw CouldNotGetAllNotesException();
-    }
-  }
-
   //Creating New  Note
   Future<CloudNote> createNewNote({required String ownerUserId}) async {
     final document = await notes.add({
@@ -60,14 +48,13 @@ class FirebaseCloudStorage {
       documentId: fetchedNote.id,
       ownerUserId: ownerUserId,
       text: '',
-     );
+    );
   }
 
   // CREATING SINGELTON //
   //Factory Constructor talking with static final field which inturns calls private constructor
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
-
   //Private Constructor
   FirebaseCloudStorage._sharedInstance();
   //Factory Constructor
