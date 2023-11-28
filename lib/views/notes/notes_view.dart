@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
+import 'package:testproject/extensions/buildcontext/loc.dart';
 import 'package:testproject/services/auth/auth_service.dart';
 import 'package:testproject/services/auth/bloc/auth_bloc.dart';
 import 'package:testproject/services/auth/bloc/auth_event.dart';
@@ -11,6 +12,10 @@ import 'dart:developer' as devtools show log;
 import '../../constants/routes.dart';
 import '../../enums/menu_actions.dart';
 import '../../utilities/dialogs/logout_dialog.dart';
+
+extension Count<T extends Iterable> on Stream<T> {
+  Stream<int> get getLength => map((event) => event.length);
+}
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -34,7 +39,18 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Notes'),
+        title: StreamBuilder(
+          stream: _notesService.allNotes(ownerUserId: userId).getLength,
+          builder: (context, AsyncSnapshot<int> snapshot) {
+            if (snapshot.hasData) {
+              final noteCount = snapshot.data ?? 0;
+              final text = context.loc.notes_title(noteCount);
+              return Text(text);
+            } else {
+              return const Text('');
+            }
+          },
+        ),
         actions: [
           IconButton(
               onPressed: () {
@@ -50,15 +66,15 @@ class _NotesViewState extends State<NotesView> {
                   if (shouldLogout) {
                     context.read<AuthBloc>().add(
                           const AuthEventLogOut(),
-                         );
+                        );
                   }
               }
             },
             itemBuilder: (context) {
-              return const [
+              return [
                 PopupMenuItem<MenuAction>(
                   value: MenuAction.logout,
-                  child: Text('Log Out'),
+                  child: Text(context.loc.logout_button),
                 ),
               ];
             },
